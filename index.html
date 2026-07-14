@@ -834,8 +834,7 @@ function analyzeMarket(opts){
   const sortBy = opts.sort_by || 'value_2025';
   const sortDesc = opts.sort_desc !== false;
   const minValue2025 = (typeof opts.min_value_2025 === 'number') ? opts.min_value_2025 : 1000000;
-  const limit = opts.limit === Infinity ? out.length : Math.min(opts.limit || 15, 50);
-
+  const limit = opts.limit === Infinity ? Infinity : Math.min(opts.limit || 15, 50);
   const fAtc4 = filters.atc4 ? filters.atc4.toUpperCase() : null;
   const fMol = filters.molecule ? filters.molecule.toUpperCase() : null;
   const fCorp = filters.corporation ? filters.corporation.toUpperCase() : null;
