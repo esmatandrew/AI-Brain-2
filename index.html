@@ -1361,8 +1361,8 @@ function closeDrawer(){
 // NEW: Make drawer title clickable to jump into Market Analysis
 document.getElementById('drawerTitle').addEventListener('click', () => {
   closeDrawer();
-  switchToTab('analysis');
-  renderMarketAnalysis(currentDrawerItem.label, currentDrawerItem.groupBy);
+  window.switchToTab('analysis');
+  window.renderMarketAnalysis(currentDrawerItem.label, currentDrawerItem.groupBy);
 });
 /* ======================================================================
    AI AGENT — TOOL-CALLING LOOP AGAINST GEMINI generateContent API
