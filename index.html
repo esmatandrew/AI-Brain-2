@@ -2513,21 +2513,7 @@
       };
     }
 
-    // Update Reset button to clear checkboxes and radios
-    document.getElementById('resetFilters').addEventListener('click', () => {
-      document.querySelector('input[name="fGroupBy"][value="atc4"]').checked = true;
-      document.querySelector('input[name="fMetric"][value="value_2025"]').checked = true;
-      document.querySelector('input[name="fScope"][value="all"]').checked = true;
-      
-      document.querySelectorAll('input[name="fCombo"]').forEach(cb => cb.checked = false);
-      document.querySelectorAll('input[name="fMolType"]').forEach(cb => cb.checked = false);
-      
-      document.getElementById('fSearch').value = '';
-      document.getElementById('fMinVal').value = '';
-      document.getElementById('fMaxVal').value = '';
-      
-      runExplorerQuery();
-    });
+    
 
     function runExplorerQuery() {
       const st = getFilterState();
