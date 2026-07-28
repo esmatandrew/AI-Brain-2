@@ -1437,6 +1437,29 @@
                         <label><input type="checkbox" name="fMolType" value="OTHERS"> Others (Vitamins/Herbals)</label>
                       </div>
                     </div>
+                    <div class="filter-group">
+                      <div class="filter-group-head">Competitors</div>
+                      <div class="filter-options">
+                        <div style="display:flex; gap:4px;">
+                          <input id="fMinComp" type="number" placeholder="Min (e.g. 1)">
+                          <input id="fMaxComp" type="number" placeholder="Max (e.g. 5)">
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="filter-group">
+                      <div class="filter-group-head">NFC1 Category</div>
+                      <div class="filter-options" id="nfc1-container" style="max-height: 160px; overflow-y: auto;">
+                        <!-- Populated dynamically via JS -->
+                      </div>
+                    </div>
+
+                    <div class="filter-group">
+                      <div class="filter-group-head">NFC3 Category</div>
+                      <div class="filter-options" id="nfc3-container" style="max-height: 160px; overflow-y: auto;">
+                        <!-- Populated dynamically via JS -->
+                      </div>
+                    </div>
 
                     <div class="filter-group">
                       <div class="filter-group-head">Search & Limits</div>
@@ -1684,8 +1707,9 @@
           // 3. Global Combo Filter
           if (st.combo !== 'ALL' && comboLabel.toUpperCase() !== st.combo) return false;
 
-          // 4. Global NFC1 Filter
-          if (st.nfc1 && !nfc1Label.toUpperCase().includes(st.nfc1.toUpperCase())) return false;
+          // 4. Global NFC1 & NFC3 Filter
+          if (st.nfc1 && st.nfc1.length > 0 && !st.nfc1.includes(nfc1Label)) return false;
+          if (st.nfc3 && st.nfc3.length > 0 && !st.nfc3.includes(nfc3Label)) return false;
 
           // 5. Global Scope (GNP Footprint)
           const isGnp = isGnpCorpLabel(corpLabel);
@@ -1952,27 +1976,37 @@
       document.getElementById('metaRecords').textContent = DATA.rows.length.toLocaleString();
 
       // Build the product-level (product+company+pack) molecule-type map
-      // used by every "Molecule Type" filter check across the app.
       PRODUCT_MOL_TYPE = buildProductMolTypeMap();
 
-      // Dynamically populate the NFC1 Dropdown based on database contents
-      const nfc1Select = document.getElementById('fNfc1');
-      if (nfc1Select) {
-        const uniqueNfc1 = new Set();
+      // Populate new checkbox filters
+      populateDynamicFilters();
+    }
 
-        // Extract unique NFC1 values from the rows
-        DATA.rows.forEach(r => {
-          const val = DATA.nfc1 ? DATA.nfc1[r[IDX.nfc1]] : r[IDX.nfc1];
-          if (val) uniqueNfc1.add(val);
-        });
+    function populateDynamicFilters() {
+      const nfc1Set = new Set();
+      const nfc3Set = new Set();
+      
+      // Extract unique values
+      DATA.rows.forEach(r => {
+        const n1 = DATA.nfc1 ? DATA.nfc1[r[IDX.nfc1]] : r[IDX.nfc1];
+        const n3 = DATA.nfc3 ? DATA.nfc3[r[IDX.nfc3]] : r[IDX.nfc3];
+        if (n1 && n1.trim() !== '') nfc1Set.add(n1);
+        if (n3 && n3.trim() !== '') nfc3Set.add(n3);
+      });
 
-        // Sort alphabetically and append to the select menu
-        Array.from(uniqueNfc1).sort().forEach(val => {
-          const opt = document.createElement('option');
-          opt.value = val;
-          opt.textContent = val;
-          nfc1Select.appendChild(opt);
-        });
+      const n1Container = document.getElementById('nfc1-container');
+      const n3Container = document.getElementById('nfc3-container');
+      
+      if (n1Container) {
+        n1Container.innerHTML = Array.from(nfc1Set).sort().map(val => 
+          `<label><input type="checkbox" name="fNfc1" value="${val}"> ${val}</label>`
+        ).join('');
+      }
+      
+      if (n3Container) {
+        n3Container.innerHTML = Array.from(nfc3Set).sort().map(val => 
+          `<label><input type="checkbox" name="fNfc3" value="${val}"> ${val}</label>`
+        ).join('');
       }
     }
 
@@ -2080,8 +2114,8 @@
       const fAtc4 = filters.atc4 ? filters.atc4.toUpperCase() : null;
       const fMol = filters.molecule ? filters.molecule.toUpperCase() : null;
       const fCorp = filters.corporation ? filters.corporation.toUpperCase() : null;
-      const fNfc3 = filters.nfc3 ? filters.nfc3.toUpperCase() : null;
-      const fNfc1 = filters.nfc1 ? filters.nfc1.toUpperCase() : null; // <-- Add this line
+      const fNfc1Arr = filters.nfc1 || [];
+      const fNfc3Arr = filters.nfc3 || [];
       const fCombo = filters.combo_type ? filters.combo_type.toUpperCase() : null;
       const gnpOnly = !!filters.gnp_only;
       const excludeGnp = !!filters.exclude_gnp;
@@ -2105,8 +2139,8 @@
         if (fAtc4 && !atc4Label.toUpperCase().includes(fAtc4)) continue;
         if (fMol && !molLabel.toUpperCase().includes(fMol)) continue;
         if (fCorp && !corpLabel.toUpperCase().includes(fCorp)) continue;
-        if (fNfc1 && !nfc1Label.toUpperCase().includes(fNfc1)) continue; // <-- Add this line
-        if (fNfc3 && !nfc3Label.toUpperCase().includes(fNfc3)) continue;
+        if (fNfc1Arr.length > 0 && !fNfc1Arr.includes(nfc1Label)) continue;
+        if (fNfc3Arr.length > 0 && !fNfc3Arr.includes(nfc3Label)) continue;
         if (fCombo && comboLabel.toUpperCase() !== fCombo) continue;
 
         const isGnp = isGnpCorpLabel(corpLabel);
@@ -2302,28 +2336,50 @@
       return checked[0].value;
     }
 
+    function getMultiCheckboxVal(name) {
+      return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(cb => cb.value);
+    }
+
     function getFilterState() {
       return {
         group_by: getRadioVal('fGroupBy') || 'atc4',
         metric: getRadioVal('fMetric') || 'value_2025',
         scope: getRadioVal('fScope') || 'all',
         
-        // Checkboxes simulate dropdown "ALL" if both or neither are checked
         combo: getCheckboxVal('fCombo', 'ALL'),
         mol_type: getCheckboxVal('fMolType', 'ALL'),
+        
+        nfc1: getMultiCheckboxVal('fNfc1'), // Returns array of selected strings
+        nfc3: getMultiCheckboxVal('fNfc3'), // Returns array of selected strings
         
         search: document.getElementById('fSearch').value.trim(),
         min_val: document.getElementById('fMinVal').value,
         max_val: document.getElementById('fMaxVal').value,
+        min_comp: document.getElementById('fMinComp').value,
+        max_comp: document.getElementById('fMaxComp').value,
         
-        // Fallbacks for fields removed from quick view to keep JS from breaking
-        nfc1: '', 
-        min_comp: '',
-        max_comp: '',
-        min_cagr: '',
-        min_yoy: ''
+        min_cagr: '', 
+        min_yoy: '' 
       };
     }
+
+    // Update Reset button to clear everything
+    document.getElementById('resetFilters').addEventListener('click', () => {
+      document.querySelector('input[name="fGroupBy"][value="atc4"]').checked = true;
+      document.querySelector('input[name="fMetric"][value="value_2025"]').checked = true;
+      document.querySelector('input[name="fScope"][value="all"]').checked = true;
+      
+      document.querySelectorAll('input[name="fCombo"], input[name="fMolType"], input[name="fNfc1"], input[name="fNfc3"]')
+        .forEach(cb => cb.checked = false);
+      
+      document.getElementById('fSearch').value = '';
+      document.getElementById('fMinVal').value = '';
+      document.getElementById('fMaxVal').value = '';
+      document.getElementById('fMinComp').value = '';
+      document.getElementById('fMaxComp').value = '';
+      
+      runExplorerQuery();
+    });
 
     // Update Reset button to clear checkboxes and radios
     document.getElementById('resetFilters').addEventListener('click', () => {
@@ -2354,7 +2410,8 @@
       if (st.scope === 'gnp_only') filters.gnp_only = true;
       if (st.scope === 'exclude_gnp') filters.exclude_gnp = true;
       if (st.combo !== 'ALL') filters.combo_type = st.combo;
-      if (st.nfc1) filters.nfc1 = st.nfc1; // <-- Add this line
+      if (st.nfc1 && st.nfc1.length > 0) filters.nfc1 = st.nfc1;
+      if (st.nfc3 && st.nfc3.length > 0) filters.nfc3 = st.nfc3;
 
       const minV = st.min_val ? Number(st.min_val) : (st.group_by === 'product' ? 100000 : 1000000);
       const maxV = st.max_val ? Number(st.max_val) : Infinity;
