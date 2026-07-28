@@ -2487,6 +2487,7 @@
     }
 
     function getFilterState() {
+      const safeVal = (id) => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
       return {
         group_by: getRadioVal('fGroupBy') || 'atc4',
         metric: getRadioVal('fMetric') || 'value_2025',
@@ -2495,14 +2496,15 @@
         combo: getCheckboxVal('fCombo', 'ALL'),
         mol_type: getCheckboxVal('fMolType', 'ALL'),
         
-        nfc1: getMultiCheckboxVal('fNfc1'), // Returns array of selected strings
-        nfc3: getMultiCheckboxVal('fNfc3'), // Returns array of selected strings
+        // Link to the new modal selections
+        nfc1: sfSelections['nfc1'] && sfSelections['nfc1'].length ? sfSelections['nfc1'] : getMultiCheckboxVal('fNfc1'), 
+        nfc3: sfSelections['nfc3'] && sfSelections['nfc3'].length ? sfSelections['nfc3'] : getMultiCheckboxVal('fNfc3'), 
         
-        search: document.getElementById('fSearch').value.trim(),
-        min_val: document.getElementById('fMinVal').value,
-        max_val: document.getElementById('fMaxVal').value,
-        min_comp: document.getElementById('fMinComp').value,
-        max_comp: document.getElementById('fMaxComp').value,
+        search: safeVal('fSearch'),
+        min_val: safeVal('fMinVal'),
+        max_val: safeVal('fMaxVal'),
+        min_comp: safeVal('fMinComp'),
+        max_comp: safeVal('fMaxComp'),
         
         min_cagr: '', 
         min_yoy: '' 
@@ -2852,24 +2854,18 @@
     }
 
     /* ---------------------------- FILTER WIRING ---------------------------- */
-    document.getElementById('applyFilters').addEventListener('click', runExplorerQuery);
-    document.getElementById('resetFilters').addEventListener('click', () => {
-      document.getElementById('fGroupBy').value = 'atc4';
-      document.getElementById('fMetric').value = 'value_2025';
-      document.getElementById('fSearch').value = '';
-      document.getElementById('fScope').value = 'all';
-      document.getElementById('fCombo').value = 'ALL';
-      document.getElementById('fMinVal').value = '';
-      document.getElementById('fMaxVal').value = '';
-      document.getElementById('fMinComp').value = '';
-      document.getElementById('fMaxComp').value = '';
-      document.getElementById('fMinCagr').value = '';
-      document.getElementById('fMinYoy').value = '';
-      document.getElementById('fNfc1').value = ''; // <-- Add this line
-      document.getElementById('fMolType').value = 'ALL';
-      runExplorerQuery();
-    });
-    document.getElementById('fSearch').addEventListener('keydown', e => { if (e.key === 'Enter') runExplorerQuery(); });
+    if (document.getElementById('applyFilters')) {
+      document.getElementById('applyFilters').addEventListener('click', runExplorerQuery);
+    }
+    if (document.getElementById('resetFilters')) {
+      document.getElementById('resetFilters').addEventListener('click', () => {
+        sfSelections = {}; // Clear modal selections
+        runExplorerQuery();
+      });
+    }
+    if (document.getElementById('fSearch')) {
+      document.getElementById('fSearch').addEventListener('keydown', e => { if (e.key === 'Enter') runExplorerQuery(); });
+    }
 
     /* ======================================================================
        INIT
@@ -2974,6 +2970,7 @@
 
       sfSelections[currentFilterKey] = Array.from(currentSet);
       closeFilterModal();
+      runExplorerQuery(); // Added this so it refreshes the data!
     }
   </script>
 </body>
