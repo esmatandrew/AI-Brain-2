@@ -1294,6 +1294,180 @@
       display: flex;
       flex-direction: column;
     }
+
+    /* ============================= SUPERFILTER & MODAL ============================= */
+    .sidebar-header-custom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .sidebar-header-custom h3 {
+      margin: 0;
+      font-family: var(--font-body);
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+
+    .sf-icon {
+      color: #1a73e8;
+      font-size: 18px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .sf-tabs {
+      display: flex;
+      background: #fff;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .sf-tab {
+      flex: 1;
+      text-align: center;
+      padding: 12px 0;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--ink-faint);
+      border-bottom: 2px solid transparent;
+    }
+
+    .sf-tab.active {
+      color: var(--ink);
+      border-bottom-color: #1a73e8;
+    }
+
+    .sf-header {
+      background: #e9ecef;
+      padding: 12px 16px;
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--ink);
+    }
+
+    .sf-item {
+      padding: 12px 16px 12px 24px;
+      font-size: 13px;
+      cursor: pointer;
+      background: #fff;
+      border-bottom: 1px solid #f8f9fa;
+      color: var(--ink);
+      transition: background 0.15s;
+    }
+
+    .sf-item:hover {
+      background: #f1f3f5;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(18, 36, 31, 0.4);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      background: #fff;
+      width: 400px;
+      max-width: 90vw;
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      max-height: 80vh;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+
+    .modal-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h3 {
+      margin: 0;
+      font-size: 16px;
+      font-family: var(--font-display);
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: var(--ink-faint);
+    }
+
+    .modal-search {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .modal-search input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid var(--line-strong);
+      border-radius: 4px;
+      font-family: var(--font-body);
+      font-size: 13px;
+    }
+
+    .modal-select-all {
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--line);
+      font-size: 13px;
+      font-weight: 600;
+      background: #f8f9fa;
+    }
+
+    .modal-select-all label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .modal-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px 16px;
+    }
+
+    .modal-list label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 0;
+      font-size: 13px;
+      cursor: pointer;
+      color: var(--ink-soft);
+    }
+
+    .modal-list input[type="checkbox"],
+    .modal-select-all input[type="checkbox"] {
+      accent-color: #1a73e8;
+      width: 14px;
+      height: 14px;
+      cursor: pointer;
+    }
+
+    .modal-footer {
+      padding: 12px 16px;
+      border-top: 1px solid var(--line);
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+     
   </style>
 </head>
 
@@ -1376,110 +1550,82 @@
             
             <div class="explorer-layout">
               <!-- Collapsible Sidebar -->
-              <aside class="filter-sidebar collapsed" id="superFilterSidebar" onclick="if(this.classList.contains('collapsed')) toggleSidebar()">
-                
+              <aside class="filter-sidebar expanded" id="superFilterSidebar">
                 <!-- Slim View (Closed) -->
-                <div class="slim-view">
-                  <div class="slim-text">Filters</div>
+                <div class="slim-view" onclick="toggleSidebar(event)">
+                  <div class="slim-text">SuperFilter</div>
                 </div>
 
                 <!-- Expanded View (Open) -->
                 <div class="expanded-view">
-                  <div class="sidebar-header">
+                  <div class="sidebar-header-custom">
+                    <span class="sf-icon" onclick="toggleSidebar(event)">&lt;</span>
                     <h3>SuperFilter</h3>
-                    <button class="toggle-sidebar-btn" onclick="toggleSidebar(event)">❮</button>
+                    <span class="sf-icon">⋮</span>
                   </div>
                   
-                  <div class="sidebar-content">
+                  <div class="sf-tabs">
+                    <div class="sf-tab active">Default View</div>
+                    <div class="sf-tab">Selected Items</div>
+                  </div>
+                  
+                  <div class="sidebar-content" style="background: #fff; padding-bottom: 20px;">
                     
-                    <div class="filter-group">
-                      <div class="filter-group-head">Group By</div>
-                      <div class="filter-options">
-                        <label><input type="radio" name="fGroupBy" value="atc4" checked> ATC4 category</label>
-                        <label><input type="radio" name="fGroupBy" value="molecule"> Molecule</label>
-                        <label><input type="radio" name="fGroupBy" value="corporation"> Corporation</label>
-                        <label><input type="radio" name="fGroupBy" value="product"> Product / brand</label>
-                        <label><input type="radio" name="fGroupBy" value="nfc3"> Dosage form</label>
-                      </div>
-                    </div>
+                    <!-- Company -->
+                    <div class="sf-header">Company</div>
+                    <div class="sf-item" onclick="openFilterModal('Corporation', 'corp')">Corporation</div>
+                    <div class="sf-item" onclick="openFilterModal('Manufacturer', 'manufacturer')">Manufacturer</div>
 
-                    <div class="filter-group">
-                      <div class="filter-group-head">Rank By</div>
-                      <div class="filter-options">
-                        <label><input type="radio" name="fMetric" value="value_2025" checked> 2025 market value</label>
-                        <label><input type="radio" name="fMetric" value="cagr"> CAGR 2021→2025</label>
-                        <label><input type="radio" name="fMetric" value="yoy_growth"> YoY growth 24→25</label>
-                        <label><input type="radio" name="fMetric" value="hhi"> Fragmentation</label>
-                      </div>
-                    </div>
+                    <!-- Product -->
+                    <div class="sf-header">Product</div>
+                    <div class="sf-item" onclick="openFilterModal('Product', 'product')">Product</div>
+                    <div class="sf-item" onclick="openFilterModal('Molecule', 'molecule')">Molecule</div>
+                    <div class="sf-item" onclick="openFilterModal('Molecule Combination Type', 'combo')">Molecule Combination Type</div>
+                    <div class="sf-item" onclick="openFilterModal('Launch Year', 'launch_year')">Launch Year</div>
 
-                    <div class="filter-group">
-                      <div class="filter-group-head">GNP Footprint</div>
-                      <div class="filter-options">
-                        <label><input type="radio" name="fScope" value="all" checked> All markets</label>
-                        <label><input type="radio" name="fScope" value="exclude_gnp"> White Space (GNP Absent)</label>
-                        <label><input type="radio" name="fScope" value="gnp_only"> GNP Present Only</label>
-                      </div>
-                    </div>
+                    <!-- Pack -->
+                    <div class="sf-header">Pack</div>
+                    <div class="sf-item" onclick="openFilterModal('Pack', 'pack')">Pack</div>
+                    <div class="sf-item" onclick="openFilterModal('Strength', 'strength')">Strength</div>
+                    <div class="sf-item" onclick="openFilterModal('Launch Date', 'launch')">Launch Date</div>
+                    <div class="sf-item" onclick="openFilterModal('Retail Price', 'price')">Retail Price</div>
 
-                    <div class="filter-group">
-                      <div class="filter-group-head">Composition</div>
-                      <div class="filter-options">
-                        <label><input type="checkbox" name="fCombo" value="MONO"> Mono-Molecule Only</label>
-                        <label><input type="checkbox" name="fCombo" value="COMBI"> Combinations Only</label>
-                      </div>
-                    </div>
+                    <!-- NFC -->
+                    <div class="sf-header">NFC</div>
+                    <div class="sf-item" onclick="openFilterModal('NFC1', 'nfc1')">NFC1</div>
+                    <div class="sf-item" onclick="openFilterModal('NFC2', 'nfc2')">NFC2</div>
+                    <div class="sf-item" onclick="openFilterModal('NFC3', 'nfc3')">NFC3</div>
 
-                    <div class="filter-group">
-                      <div class="filter-group-head">Molecule Type</div>
-                      <div class="filter-options">
-                        <label><input type="checkbox" name="fMolType" value="PHARMA"> Pharmaceuticals Only</label>
-                        <label><input type="checkbox" name="fMolType" value="OTHERS"> Others (Vitamins/Herbals)</label>
-                      </div>
-                    </div>
-                    <div class="filter-group">
-                      <div class="filter-group-head">Competitors</div>
-                      <div class="filter-options">
-                        <div style="display:flex; gap:4px;">
-                          <input id="fMinComp" type="number" placeholder="Min (e.g. 1)">
-                          <input id="fMaxComp" type="number" placeholder="Max (e.g. 5)">
-                        </div>
-                      </div>
-                    </div>
-
-                    <div class="filter-group">
-                      <div class="filter-group-head">NFC1 Category</div>
-                      <div class="filter-options" id="nfc1-container" style="max-height: 160px; overflow-y: auto;">
-                        <!-- Populated dynamically via JS -->
-                      </div>
-                    </div>
-
-                    <div class="filter-group">
-                      <div class="filter-group-head">NFC3 Category</div>
-                      <div class="filter-options" id="nfc3-container" style="max-height: 160px; overflow-y: auto;">
-                        <!-- Populated dynamically via JS -->
-                      </div>
-                    </div>
-
-                    <div class="filter-group">
-                      <div class="filter-group-head">Search & Limits</div>
-                      <div class="filter-options">
-                        <input id="fSearch" type="text" placeholder="Keyword (e.g. Vitamin)">
-                        <div style="display:flex; gap:4px; margin-top: 6px;">
-                          <input id="fMinVal" type="number" placeholder="Min Value">
-                          <input id="fMaxVal" type="number" placeholder="Max Value">
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div class="sidebar-header" style="justify-content: center; border-top: 1px solid var(--line); border-bottom: none;">
-                    <button class="btn ghost small" id="resetFilters" style="flex:1; text-align:center; justify-content:center;">Reset</button>
-                    <div style="width: 8px;"></div>
-                    <button class="btn small" id="applyFilters" style="flex:1; text-align:center; justify-content:center;">Apply</button>
+                    <!-- Period -->
+                    <div class="sf-header">Period</div>
+                    <div class="sf-item" onclick="openFilterModal('Period', 'period')">Period</div>
+                    
                   </div>
                 </div>
               </aside>
+
+              <!-- Filter Modal Overlay -->
+              <div id="filterModal" class="modal-overlay hidden">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h3 id="modalTitle">Select Options</h3>
+                    <button class="modal-close" onclick="closeFilterModal()">×</button>
+                  </div>
+                  <div class="modal-search">
+                    <input type="text" id="modalSearch" placeholder="Search..." onkeyup="handleModalSearch()">
+                  </div>
+                  <div class="modal-select-all">
+                    <label><input type="checkbox" id="modalSelectAll" onchange="toggleSelectAll(this)"> Select All</label>
+                  </div>
+                  <div class="modal-list" id="modalList">
+                    <!-- Checkboxes dynamically populated here -->
+                  </div>
+                  <div class="modal-footer">
+                    <button class="btn ghost" onclick="closeFilterModal()">Cancel</button>
+                    <button class="btn" style="background:#1a73e8; border-color:#1a73e8;" onclick="applyFilterModal()">OK</button>
+                  </div>
+                </div>
+              </div>
 
               <!-- Main Data View -->
               <div class="explorer-main">
@@ -2739,6 +2885,96 @@
         document.getElementById('loadingText').textContent = 'Failed to load data.json — ' + e.message;
       }
     })();
+
+    /* ============================= SUPERFILTER MODAL LOGIC ============================= */
+    let currentFilterKey = '';
+    let currentFilterData = [];
+    let sfSelections = {}; 
+
+    function openFilterModal(title, key) {
+      let rawData = [];
+
+      // Map keys to dataset
+      if (DATA[key]) {
+        rawData = DATA[key];
+      } else if (DATA.rows) {
+        if (key === 'product') rawData = DATA.rows.map(r => r[IDX.product]);
+        else if (key === 'strength') rawData = DATA.rows.map(r => r[IDX.strength]);
+        else if (key === 'pack') rawData = DATA.rows.map(r => r[IDX.pack]);
+        else if (key === 'launch' || key === 'launch_year') rawData = DATA.rows.map(r => r[IDX.launch]);
+        else if (key === 'price') rawData = DATA.rows.map(r => r[IDX.price]);
+        else if (key === 'manufacturer') rawData = DATA.rows.map(r => r[IDX.corp]); 
+        else if (key === 'nfc2') rawData = DATA.rows.map(r => r[IDX.nfc1]); 
+        else if (key === 'period') rawData = ['2021', '2022', '2023', '2024', '2025', '2026 YTD']; 
+      }
+
+      // Remove duplicates and clean
+      currentFilterData = [...new Set(rawData)].filter(Boolean).sort();
+      currentFilterKey = key;
+
+      document.getElementById('modalTitle').innerText = title;
+      document.getElementById('modalSearch').value = '';
+      document.getElementById('filterModal').classList.remove('hidden');
+      
+      renderModalList();
+    }
+
+    function closeFilterModal() {
+      document.getElementById('filterModal').classList.add('hidden');
+    }
+
+    function renderModalList() {
+      const query = document.getElementById('modalSearch').value.toLowerCase();
+      const listEl = document.getElementById('modalList');
+      const filtered = currentFilterData.filter(item => String(item).toLowerCase().includes(query));
+      
+      const selectedSet = new Set(sfSelections[currentFilterKey] || []);
+      
+      listEl.innerHTML = filtered.map(item => `
+        <label>
+          <input type="checkbox" class="modal-item-cb" value="${item}" ${selectedSet.has(String(item)) ? 'checked' : ''} onchange="checkSelectAllStatus()">
+          ${item}
+        </label>
+      `).join('');
+
+      checkSelectAllStatus();
+    }
+
+    function handleModalSearch() {
+      renderModalList();
+    }
+
+    function toggleSelectAll(checkbox) {
+      const checkboxes = document.querySelectorAll('.modal-item-cb');
+      checkboxes.forEach(cb => cb.checked = checkbox.checked);
+    }
+
+    function checkSelectAllStatus() {
+      const checkboxes = document.querySelectorAll('.modal-item-cb');
+      const allChecked = checkboxes.length > 0 && Array.from(checkboxes).every(cb => cb.checked);
+      document.getElementById('modalSelectAll').checked = allChecked;
+    }
+
+    function applyFilterModal() {
+      const checkboxes = document.querySelectorAll('.modal-item-cb');
+      
+      if (!sfSelections[currentFilterKey]) {
+        sfSelections[currentFilterKey] = [];
+      }
+      
+      const currentSet = new Set(sfSelections[currentFilterKey]);
+      
+      checkboxes.forEach(cb => {
+        if (cb.checked) {
+          currentSet.add(cb.value);
+        } else {
+          currentSet.delete(cb.value);
+        }
+      });
+
+      sfSelections[currentFilterKey] = Array.from(currentSet);
+      closeFilterModal();
+    }
   </script>
 </body>
 
