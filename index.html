@@ -2487,7 +2487,9 @@
     }
 
     function getFilterState() {
+      // Safely access values so we don't throw null errors
       const safeVal = (id) => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+      
       return {
         group_by: getRadioVal('fGroupBy') || 'atc4',
         metric: getRadioVal('fMetric') || 'value_2025',
@@ -2496,7 +2498,7 @@
         combo: getCheckboxVal('fCombo', 'ALL'),
         mol_type: getCheckboxVal('fMolType', 'ALL'),
         
-        // Link to the new modal selections
+        // Link to the new modal selections seamlessly
         nfc1: sfSelections['nfc1'] && sfSelections['nfc1'].length ? sfSelections['nfc1'] : getMultiCheckboxVal('fNfc1'), 
         nfc3: sfSelections['nfc3'] && sfSelections['nfc3'].length ? sfSelections['nfc3'] : getMultiCheckboxVal('fNfc3'), 
         
@@ -2510,24 +2512,6 @@
         min_yoy: '' 
       };
     }
-
-    // Update Reset button to clear everything
-    document.getElementById('resetFilters').addEventListener('click', () => {
-      document.querySelector('input[name="fGroupBy"][value="atc4"]').checked = true;
-      document.querySelector('input[name="fMetric"][value="value_2025"]').checked = true;
-      document.querySelector('input[name="fScope"][value="all"]').checked = true;
-      
-      document.querySelectorAll('input[name="fCombo"], input[name="fMolType"], input[name="fNfc1"], input[name="fNfc3"]')
-        .forEach(cb => cb.checked = false);
-      
-      document.getElementById('fSearch').value = '';
-      document.getElementById('fMinVal').value = '';
-      document.getElementById('fMaxVal').value = '';
-      document.getElementById('fMinComp').value = '';
-      document.getElementById('fMaxComp').value = '';
-      
-      runExplorerQuery();
-    });
 
     // Update Reset button to clear checkboxes and radios
     document.getElementById('resetFilters').addEventListener('click', () => {
@@ -2854,6 +2838,7 @@
     }
 
     /* ---------------------------- FILTER WIRING ---------------------------- */
+    // Only attach listeners if elements exist in the new UI to prevent crashes
     if (document.getElementById('applyFilters')) {
       document.getElementById('applyFilters').addEventListener('click', runExplorerQuery);
     }
